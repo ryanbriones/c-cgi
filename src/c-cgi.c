@@ -10,6 +10,7 @@ struct Param {
 
 void parse_params(void);
 char *get_param(char *);
+void *malloc_param(char *, char *);
 
 int main(void) {
   printf("Content-Type: text/plain\n\n");
@@ -18,8 +19,6 @@ int main(void) {
   parse_params();
   printf("foo: %s\n", get_param("foo"));
   printf("baz: %s\n", get_param("baz"));
-  /*if(requestParams != NULL)
-    requestParams->key;*/
 }
 
 void parse_params(void) {
@@ -29,16 +28,17 @@ void parse_params(void) {
   
   query_string = getenv("QUERY_STRING");
 
-  current_pair = malloc( sizeof(char*) );
+  current_pair = malloc( strlen(query_string) + 1 );
   while( sscanf(query_string, "%[^&]%n", current_pair, &chars_read_for_pair) == 1 ) {
-    current_key = malloc( sizeof(char*) );
+    
+    current_key = malloc( strlen(current_pair) + 1 );
     sscanf(current_pair, "%[^=]=%n", current_key, &chars_read_for_part);
     current_pair += chars_read_for_part;
     
-    current_value = malloc( sizeof(char *) );
+    current_value = malloc( strlen(current_pair) + 1 );
     sscanf(current_pair, "%s", current_value);
     
-    current_param = malloc( sizeof( struct Param ) );
+    current_param = malloc_param( current_key, current_value );
 
     if(NULL == current_param) {
       printf("Out of memory.");
@@ -62,6 +62,10 @@ void parse_params(void) {
       ++query_string;
     }
   }
+}
+
+void *malloc_param(char *key, char *value) {
+  return malloc( strlen(key) + strlen(value) + sizeof(void *) );
 }
 
 char *get_param(char *key) {

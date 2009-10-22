@@ -4,7 +4,9 @@ My test bed for learning C using CGI. It's what I know.
 
 ## TODO
 
-* fix problem where param values bigger than some weird length cause overflow (ie. foo=abcdefghijklmnopqrstuvwxyz)
+* figure out how to write tests and do it.
+* split off web specific stuff into it's own file
+* do something useful
 
 ## LICENSE
 
