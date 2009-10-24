@@ -22,22 +22,15 @@ int main(void) {
 }
 
 void parse_params(void) {
-  char *query_string, *current_pair, *current_key, *current_value;
-  int chars_read_for_pair, chars_read_for_part;
+  char *query_string, *current_key, *current_value;
+  int chars_read;
   struct Param *current_param;
   
   query_string = getenv("QUERY_STRING");
 
-  current_pair = malloc( strlen(query_string) + 1 );
-  while( sscanf(query_string, "%[^&]%n", current_pair, &chars_read_for_pair) == 1 ) {
-    
-    current_key = malloc( strlen(current_pair) + 1 );
-    sscanf(current_pair, "%[^=]=%n", current_key, &chars_read_for_part);
-    current_pair += chars_read_for_part;
-    
-    current_value = malloc( strlen(current_pair) + 1 );
-    sscanf(current_pair, "%s", current_value);
-    
+  current_key = malloc( strlen(query_string) + 1 );
+  current_value = malloc( strlen(query_string) + 1 );
+  while( sscanf(query_string, "%[^=]=%[^&]%n", current_key, current_value, &chars_read) == 2 ) {
     current_param = malloc_param( current_key, current_value );
 
     if(NULL == current_param) {
@@ -45,8 +38,10 @@ void parse_params(void) {
       exit(0);
     }
 
-    current_param->key = current_key;
-    current_param->value = current_value;
+    current_param->key = malloc( strlen(current_key) );
+    strcpy(current_param->key, current_key);
+    current_param->value = malloc( strlen(current_value) );
+    strcpy(current_param->value, current_value);
 
     if(requestParams == NULL) {
       requestParams = current_param;
@@ -57,7 +52,7 @@ void parse_params(void) {
     requestParamsTail = current_param;
     current_param->next = NULL;
 
-    query_string += chars_read_for_pair;
+    query_string += chars_read;
     if(*query_string == '&') {
       ++query_string;
     }
